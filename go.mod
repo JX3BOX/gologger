@@ -1,1 +1,1 @@
-module jx3box.com/JX3Box/gologger
+module github.com/JX3BOX/gologger
