@@ -39,19 +39,19 @@ type FileLogger struct {
 	hook        *Hook
 }
 
-func (f FileLogger) getLogFilePath() string {
+func (f *FileLogger) getLogFilePath() string {
 	f.logFilepath = filepath.Join(f.fileDir, f.fileName) + "." + f.date.Format(f.dateFormat) + ".log"
 	return f.logFilepath
 }
 
 // 日志文件是否必须分割
-func (f FileLogger) isMustSplit() bool {
+func (f *FileLogger) isMustSplit() bool {
 	t, _ := time.Parse(f.dateFormat, time.Now().Format(f.dateFormat))
 	return t.After(*f.date)
 }
 
 // 日志文件是否存在，不存在则创建
-func (f FileLogger) isExistOrCreate() {
+func (f *FileLogger) isExistOrCreate() {
 	_, err := os.Stat(f.fileDir)
 	if err != nil && !os.IsExist(err) {
 		os.Mkdir(f.fileDir, 0755)
@@ -63,10 +63,10 @@ func (f *FileLogger) split() (err error) {
 	defer f.mu.Unlock()
 
 	if f.logFile != nil {
+		f.logFile.Close()
 		if f.hook != nil {
 			f.hook.AfterSplit(f.logFilepath)
 		}
-		f.logFile.Close()
 	}
 
 	t, _ := time.Parse(f.dateFormat, time.Now().Format(f.dateFormat))
