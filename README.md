@@ -34,6 +34,7 @@ Hook  钩子处理文件切割事件
 ```golang
 type Hook struct {
 	// 文件切割完成后到调用此函数
+	// 注意在函数内部恰当调用协程，避免日志输出阻塞
 	// @params filepath 文件路径
 	AfterSplit func(filepath string) error
 }
