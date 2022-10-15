@@ -1,41 +1,42 @@
-golang 日志切割
+golang 日志
 
 ## 快速开始
 
+### 控制台日志
+
 ```go
 package main
-import "jx3box.com/JX3Box/gologger"
+import "gopkg.in/JX3Box/gologger.v2"
 
 func main(){
-    gologger.New(gologger.LoggerConf{
-		FileDir:    "./log",
-		FileName:   "dr",
-		Prefix:     "test",
-		DateFormat: "2006010215",
-	})
+	gologger.InitLogger(gologger.DebugLevel)
     gologger.Println("1111")
 }
 ```
 
-### LoggerConf
+### 写入文件
 
-```
-FileDir: 日志文件存储地址
-FileName： 日志文件
-Prefix    每行文本前缀文本
-Flag      日志flag，如：log.Ldate | log.Ltime
-DateFormat: 切割文件时间粒度。 默认为20060102，20060102表示切割到天，2006010215  表示切割到小时
-Hook  钩子处理文件切割事件
-```
+```go
+package main
+import (
+	"gopkg.in/JX3Box/gologger.v2/rotatefile"
+	"gopkg.in/huyinghuan/lumberjack.v4"
+)
 
-
-### Hook
-
-```golang
-type Hook struct {
-	// 文件切割完成后到调用此函数
-	// 注意在函数内部恰当调用协程，避免日志输出阻塞
-	// @params filepath 文件路径
-	AfterSplit func(filepath string) error
+func main(){
+	l, err := lumberjack.NewRoller(
+		"/var/log/myapp/foo.log",
+		&lumberjack.Options{
+			Filename:   "/var/log/myapp/foo.log",
+			MaxAge:     28, //days
+			RotateType: RotateDaily, //optioanl, RotateHourly or RotateDaily, If not set, use rotate by size
+			RotateTime: 1, // optional, default 1
+		})
+	if err!=nil{
+		panic(err)
+	}
+	rotatefile.New(l)
+    gologger.Println("1111")
 }
+
 ```

@@ -16,7 +16,8 @@ func GetSingleInstance() *zap.Logger {
 	return zapLogger
 }
 
-func InitLogger(level zapcore.Level) {
+func InitLogger(l Level) {
+	level := zapcore.Level(l)
 	if zapLogger != nil {
 		if level != atomicLevel.Level() {
 			Infof("zap logger change level from %s to %s", atomicLevel.Level(), level)
@@ -55,7 +56,7 @@ func InitLogger(level zapcore.Level) {
 
 func getSugarLogger() *zap.SugaredLogger {
 	if zapLogger == nil {
-		InitLogger(zap.InfoLevel)
+		InitLogger(InfoLevel)
 	}
 	return sugar
 }

@@ -10,12 +10,16 @@ import (
 
 var loggerMult map[string]*zap.SugaredLogger
 
-func New(name string, c *lumberjack.Roller) *zap.SugaredLogger {
-	if name == "" {
-		name = "default"
+func New(c *lumberjack.Roller, names ...string) *zap.SugaredLogger {
+	name := "default"
+	if len(names) > 0 {
+		name = names[0]
 	}
 	if loggerMult == nil {
 		loggerMult = make(map[string]*zap.SugaredLogger)
+	}
+	if loggerMult[name] != nil {
+		panic("logger already init:" + name)
 	}
 	atom := zap.NewAtomicLevel()
 	atom.SetLevel(zap.InfoLevel)
@@ -45,14 +49,9 @@ func New(name string, c *lumberjack.Roller) *zap.SugaredLogger {
 }
 
 func Get(names ...string) *zap.SugaredLogger {
-	name := ""
+	name := "default"
 	if len(names) > 0 {
 		name = names[0]
-	} else {
-		for k, _ := range loggerMult {
-			name = k
-			break
-		}
 	}
 
 	if loggerMult[name] != nil {
